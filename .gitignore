@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment variables / secrets
+.env
+.env.*
+
+# macOS
+.DS_Store
+
+# Node / Cloudflare
+node_modules/
+.wrangler/
+
+# IDE
+.vscode/
+.idea/
+
+# Temporary files
+*.log
+
+# Generated raw snapshots
+data/raw/*.csv
+!data/raw/app_store_charts_20260807_122441.csv
+
+# Experimental outputs
+data/processed/*_embeddings.csv

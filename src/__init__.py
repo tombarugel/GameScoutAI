@@ -1,0 +1,1 @@
+"""GameScout AI application package."""

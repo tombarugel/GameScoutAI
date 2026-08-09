@@ -112,6 +112,18 @@ IMPORTANT RULES:
 - Do not use Markdown.
 - Do not add any text before or after the JSON.
 
+CREATIVE DIVERSITY:
+- Treat every request as a fresh ideation attempt.
+- Do not default to the most obvious theme suggested by the segment name.
+- Explore different settings, fantasies, progression structures and mechanic combinations.
+- The title must be distinctive, memorable and specific to the generated concept.
+- Avoid generic mobile-game naming patterns.
+- Avoid repeatedly using words directly taken from the cluster name or keywords in the title.
+- Do not simply combine two market keywords to create the title.
+- The title should emerge from the game's fantasy or identity, not from the analytical cluster label.
+- Market evidence should constrain the opportunity, not dictate the creative theme.
+- Two valid concepts based on the same segment should be able to look and feel substantially different while addressing the same market opportunity.
+
 CONCEPT STYLE:
 ${styleInstructions[style]}
 
@@ -488,7 +500,7 @@ export default {
                 content: prompt,
               },
             ],
-            temperature: 0.5,
+            temperature: 0.8,
           },
         );
 

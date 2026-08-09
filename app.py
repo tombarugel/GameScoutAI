@@ -208,13 +208,13 @@ def render_landing_page() -> None:
 
         if review_limit == "⚡ Fast (20)":
             max_reviews = 20
-            eta = "~20 s"
+            eta = "~2 min"
         elif review_limit == "⚖️ Balanced (50)":
             max_reviews = 50
-            eta = "~40 s"
+            eta = "~5 min"
         else:
             max_reviews = None
-            eta = "~2–5 min"
+            eta = ">10 min"
 
         st.caption(f"⏱ Estimated duration: {eta}")    
         

@@ -197,16 +197,15 @@ def render_landing_page() -> None:
 
     primary, fallback = st.columns([1.25, 0.75])
     with primary:
-        st.markdown("### Review collection")
 
         review_limit = st.radio(
             "Maximum reviews per game",
-            ["⚡ 20 (Fast)", "⚖️ 50 (Balanced)", "🔬 Unlimited (Slow)"],
+            ["⚡ 20 (Fast) [Recommended]", "⚖️ 50 (Balanced)", "🔬 Unlimited (Slow)"],
             horizontal=True,
             help="Higher limits improve pain-point analysis but increase execution time."
         )
 
-        if review_limit == "⚡ 20 (Fast)":
+        if review_limit == "⚡ 20 (Fast) [Recommended]":
             max_reviews = 20
             eta = "~2 min"
         elif review_limit == "⚖️ 50 (Balanced)":
@@ -345,6 +344,57 @@ except (FileNotFoundError, ValueError) as error:
 # HELPERS
 # =============================================================================
 
+def render_page_navigation(
+    current_page: str,
+) -> None:
+    pages = [
+        "Analysis Summary",
+        "Market Overview",
+        "Game Segments",
+        "Opportunities",
+        "Concept Generator",
+    ]
+
+    current_index = pages.index(current_page)
+
+    previous_page = (
+        pages[current_index - 1]
+        if current_index > 0
+        else None
+    )
+
+    next_page = (
+        pages[current_index + 1]
+        if current_index < len(pages) - 1
+        else None
+    )
+
+    st.markdown("---")
+
+    previous_col, spacer_col, next_col = st.columns(
+        [1, 2, 1]
+    )
+
+    with previous_col:
+        if previous_page is not None:
+            if st.button(
+                "← Previous",
+                width="stretch",
+                key=f"previous_{current_page}",
+            ):
+                st.session_state["page"] = previous_page
+                st.rerun()
+
+    with next_col:
+        if next_page is not None:
+            if st.button(
+                "Next →",
+                type="primary",
+                width="stretch",
+                key=f"next_{current_page}",
+            ):
+                st.session_state["page"] = next_page
+                st.rerun()
 
 def format_number(value: object) -> str:
     try:
@@ -468,17 +518,27 @@ with st.sidebar:
     st.title("🎮 GameScout AI")
     st.caption("App Store market intelligence → game concepts")
 
+    pages = [
+    "Analysis Summary",
+    "Market Overview",
+    "Game Segments",
+    "Opportunities",
+    "Concept Generator",
+    ]
+
+    if "page" not in st.session_state:
+        st.session_state["page"] = "Analysis Summary"
+
     page = st.radio(
         "Navigate",
-        [
-            "Analysis Summary",
-            "Market Overview",
-            "Game Segments",
-            "Opportunities",
-            "Concept Generator",
-        ],
+        pages,
+        index=pages.index(
+            st.session_state["page"]
+        ),
         label_visibility="collapsed",
     )
+
+    st.session_state["page"] = page
 
     st.divider()
     st.caption(f"Mode: {st.session_state.get('analysis_mode', '—')}")
@@ -546,6 +606,7 @@ if page == "Analysis Summary":
 
     st.info("Next: inspect the market signals, then use Concept Generator to turn one opportunity into a new game idea.")
 
+    render_page_navigation("Analysis Summary")
 
 # =============================================================================
 # PAGE 1 — MARKET OVERVIEW
@@ -599,6 +660,8 @@ elif page == "Market Overview":
         display = top_games[["chart_position", "title", "developer"]].copy()
         display.columns = ["#", "Game", "Developer"]
         st.dataframe(display, hide_index=True, width="stretch", height=385)
+
+    render_page_navigation("Market Overview")
 
 
 # =============================================================================
@@ -664,6 +727,7 @@ elif page == "Game Segments":
     display = cluster_games[columns].sort_values("chart_position").copy()
     st.dataframe(display, hide_index=True, width="stretch", height=340)
 
+    render_page_navigation("Game Segments")
 
 # =============================================================================
 # PAGE 3 — OPPORTUNITIES
@@ -759,6 +823,8 @@ elif page == "Opportunities":
         if isinstance(row.get("warning"), str) and row["warning"].strip():
             st.warning(row["warning"])
         st.info(str(row["signal_summary"]))
+
+    render_page_navigation("Opportunities")
 
 
 # =============================================================================
@@ -858,3 +924,5 @@ elif page == "Concept Generator":
     st.caption(
         "The generated concept is creative output, grounded by the displayed evidence but not a prediction of commercial success."
     )
+
+    render_page_navigation("Concept Generator")

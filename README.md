@@ -112,7 +112,7 @@ Suggested screenshots:
 
 GameScout AI is fully deployed and can be accessed directly from a browser:
 
-**https://gamescout-ai.streamlit.app**
+**https://gamescoutai-qjstw95hcerp2qem2tapmz.streamlit.app/**
 
 No installation, API key, or terminal is required.
 

@@ -50,7 +50,7 @@ RANDOM_STATE = 42
 
 # Numbers of clusters that will be tested.
 MIN_CLUSTERS = 3
-MAX_CLUSTERS = 12
+MAX_CLUSTERS = 20
 
 # Number of semantic dimensions retained after SVD.
 # The script automatically reduces this value if the dataset is too small.

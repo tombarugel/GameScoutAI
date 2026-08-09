@@ -106,77 +106,29 @@ Suggested screenshots:
 
 ---
 
-# 🚀 Try GameScout AI
+# ▶️ How to Run the Project
 
-The easiest way to experience GameScout AI is through the public web application.
+## Recommended — Online Version
 
-## Live Demo
+GameScout AI is fully deployed and can be accessed directly from a browser:
 
-👉 **https://gamescout-ai.streamlit.app**
+**https://gamescout-ai.streamlit.app**
 
-Everything is already deployed and configured.
+No installation, API key, or terminal is required.
 
-- ✅ Streamlit frontend
-- ✅ Cloudflare Worker
-- ✅ Workers AI backend
+## Run Locally
 
-**No installation, terminal, or configuration is required.**
-
----
-
-# 👨‍💻 Local Development
-
-The following instructions are only required if you want to modify or extend the project.
-
-## Clone the repository
+To run the application from the source code:
 
 ```bash
 git clone https://github.com/tombarugel/GameScoutAI.git
-
 cd GameScoutAI
-```
 
-## Install Python dependencies
-
-```bash
 pip install -r requirements.txt
-```
-
-## Launch the application
-
-```bash
 streamlit run app.py
 ```
 
-The application will be available at:
-
-```
-http://localhost:8501
-```
-
----
-
-# ☁️ Deploy Your Own AI Backend (Optional)
-
-GameScout AI already uses a deployed Cloudflare Worker.
-
-You only need the following steps if you want to deploy **your own** Worker instead of using the hosted one.
-
-```bash
-cd cloudflare-worker
-
-npm install
-
-npx wrangler deploy
-```
-
-Once deployed, replace the Worker URL in:
-
-```
-src/ai_client.py
-```
-
-with your own Cloudflare Workers URL.
+The local application uses the already deployed AI backend, so no additional Cloudflare setup is required.
 
 # 🧠 Key Product Decisions
 

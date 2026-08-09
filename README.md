@@ -1,84 +1,309 @@
-# GameScout AI
+# 🎮 GameScout AI
 
-GameScout AI is a compact decision-support tool for mobile game designers. It combines a current US App Store Games snapshot, metadata enrichment, unsupervised NLP clustering, an interpretable opportunity score, public review mining, and live generative AI concept creation.
+> **AI-powered market intelligence platform for mobile game discovery and concept generation.**
 
-## Evaluator quick start
+GameScout AI is an end-to-end market intelligence platform designed to help game studios discover market opportunities and generate original game concepts using real App Store data and AI.
+
+Instead of relying on static dashboards or manual market research, the platform automatically:
+
+- 📈 Collects live App Store rankings
+- 🧩 Enriches game metadata
+- 🔍 Discovers semantic market segments
+- 🎯 Identifies underserved opportunities
+- 💬 Analyzes thousands of player reviews
+- 🤖 Generates AI-assisted game concepts grounded in market evidence
+
+---
+
+# 🚀 Live Demo
+
+**Public demo**
+
+> **ADD YOUR STREAMLIT URL HERE**
+
+Example:
+
+```
+https://gamescout-ai.streamlit.app
+```
+
+No installation is required.
+
+---
+
+# 📸 Application Overview
+
+*(Add one or two screenshots of the application here.)*
+
+Suggested screenshots:
+
+- Home page
+- Opportunity Dashboard
+- AI Concept Generator
+
+---
+
+# ✨ Features
+
+- ✅ Live App Store scraping
+- ✅ Metadata enrichment
+- ✅ Automatic market segmentation
+- ✅ Opportunity scoring
+- ✅ Player review analysis
+- ✅ Pain-point extraction
+- ✅ AI game concept generation
+- ✅ Interactive Streamlit interface
+
+---
+
+# 🏗 Architecture
+
+```text
+                 App Store
+                     │
+                     ▼
+          Live Game Rankings
+                     │
+                     ▼
+         Metadata Enrichment
+                     │
+                     ▼
+            Text Cleaning
+                     │
+                     ▼
+                 TF-IDF
+                     │
+                     ▼
+             Truncated SVD
+                     │
+                     ▼
+                 KMeans
+                     │
+                     ▼
+          Opportunity Engine
+                     │
+                     ▼
+         Review Collection
+                     │
+                     ▼
+       Pain Point Extraction
+                     │
+                     ▼
+        Cloudflare Workers AI
+                     │
+                     ▼
+          Game Concept Generator
+```
+
+---
+
+# ⚙️ Technology Stack
+
+| Layer | Technology |
+|--------|------------|
+| Frontend | Streamlit |
+| Backend | Python |
+| Machine Learning | scikit-learn |
+| NLP | TF-IDF + Truncated SVD |
+| Clustering | KMeans |
+| Data Sources | App Store RSS + iTunes API |
+| AI | Cloudflare Workers AI |
+| Deployment | Streamlit Community Cloud + Cloudflare Workers |
+
+---
+
+# ▶️ How to Run
+
+## Option 1 — Live Demo (Recommended)
+
+Open the public Streamlit application:
+
+```
+https://gamescout-ai.streamlit.app
+```
+
+---
+
+## Option 2 — Run Locally
+
+Clone the repository:
 
 ```bash
-python -m pip install -r requirements.txt
+git clone https://github.com/tombarugel/GameScoutAI.git
+
+cd GameScoutAI
+```
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Launch the application:
+
+```bash
 streamlit run app.py
 ```
 
-The application ships with cached CSV snapshots in `data/processed/`, so the market dashboard, segments, opportunity ranking and review evidence work immediately and reproducibly.
+---
 
-### Live AI generation
+## Cloudflare Worker
 
-The app calls a Cloudflare Worker using Workers AI. The default production URL is configured in `src/ai_client.py` and can be overridden without editing code:
-
-```bash
-export GAMESCOUT_WORKER_URL="https://your-worker.workers.dev"
-streamlit run app.py
-```
-
-For local Worker development:
+Deploy the AI backend:
 
 ```bash
 cd cloudflare-worker
-npx wrangler dev
-```
 
-Then in another terminal:
+npm install
 
-```bash
-export GAMESCOUT_WORKER_URL="http://localhost:8787"
-streamlit run app.py
-```
-
-Deploy the Worker once with:
-
-```bash
-cd cloudflare-worker
 npx wrangler deploy
 ```
 
-The evaluator does **not** need an API key. The AI binding is held server-side by Cloudflare.
+Then update:
 
-## Product flow
-
-1. **Market Overview** — current Top Free / Top Paid Games and developer presence.
-2. **Game Segments** — TF-IDF → SVD → KMeans semantic segments.
-3. **Opportunities** — transparent scoring based on market strength, player validation, scarcity, developer diversity, semantic coherence and confidence.
-4. **Concept Generator** — market evidence + available review pain points → Cloudflare Workers AI → structured game concept.
-
-## Refreshing the data
-
-The shipped snapshot is intentionally cached for evaluator reliability. To refresh the pipeline, run the scripts from the project root in this order:
-
-```bash
-python scripts/collect_app_store_data.py
-python scripts/enrich_app_store_metadata.py
-python scripts/build_game_clusters.py
-python scripts/build_opportunity_scores.py
-python scripts/collect_app_store_reviews.py
-python scripts/build_review_pain_points.py
+```
+src/ai_client.py
 ```
 
-Public App Store review availability is incomplete and varies by app. Review evidence is therefore treated as an optional enrichment signal rather than a required input.
+with your deployed Worker URL.
 
-## Important limitations
+---
 
-- The current data are a snapshot, so the opportunity score measures **current market signals**, not historical growth.
-- Unsupervised clusters are exploratory; franchise-dominated and mixed segments remain visible rather than being hidden.
-- Public review feeds have uneven coverage.
-- The Opportunity Score is an interpretable heuristic, not a revenue or download forecast.
-- AI-generated concepts are creative suggestions grounded in supplied evidence, not predictions of commercial success.
+# 🧠 Key Product Decisions
 
-## Live evaluator flow
+### Live market data
 
-The application now opens on an analysis launcher instead of a pre-filled dashboard.
+Rather than relying on a static dataset, the application retrieves the latest App Store rankings to provide up-to-date market intelligence.
 
-- **Start Live Analysis** executes the real project scripts in order from current App Store data through review pain-point analysis.
-- **Use Cached Snapshot** is a fallback for a fast/reproducible demo when an external Apple endpoint is unavailable.
-- After completion, the sidebar exposes the market overview, ML segments, opportunity ranking and AI concept generator.
+---
 
-For the complete live flow, keep internet access available. Review collection uses Apple's public review feed and can take several minutes because coverage varies by app.
+### Lightweight NLP pipeline
+
+TF-IDF combined with Truncated SVD was selected because it provides interpretable market segments while remaining lightweight and fast enough to run interactively.
+
+Although embedding-based approaches were explored during experimentation, the TF-IDF pipeline offered a better trade-off between interpretability, reproducibility and execution time.
+
+---
+
+### Cloudflare Workers AI
+
+Workers AI allows AI inference without requiring users to provide their own API key.
+
+This makes the application significantly easier to deploy and demonstrate while keeping infrastructure lightweight.
+
+---
+
+### Cached snapshots
+
+A cached mode is available to guarantee a smooth demonstration even if the App Store API is temporarily unavailable.
+
+---
+
+# ⚙️ Key Technical Decisions
+
+The project is intentionally organized as a modular pipeline.
+
+Each processing stage is isolated inside an independent Python script:
+
+- App Store collection
+- Metadata enrichment
+- Clustering
+- Opportunity scoring
+- Review analysis
+- AI generation
+
+Intermediate results are stored as CSV files.
+
+This architecture makes the pipeline easy to debug, rerun and extend.
+
+The frontend (Streamlit) remains completely stateless and simply orchestrates the pipeline.
+
+---
+
+# ⚠️ Known Limitations
+
+Current limitations include:
+
+- Only the US App Store is supported.
+- KMeans requires choosing the number of clusters beforehand.
+- Review availability depends on Apple's public endpoints.
+- Opportunity scores are based on heuristic rules rather than predictive models.
+- AI-generated concepts are intended for ideation and not as production-ready game designs.
+
+---
+
+# 🚀 What I Would Build Next
+
+With one additional week, I would focus on the following improvements.
+
+### Multi-country analysis
+
+Compare markets across the US, Japan, South Korea and China.
+
+---
+
+### Historical market tracking
+
+Monitor ranking evolution over time to detect emerging genres.
+
+---
+
+### Smarter opportunity scoring
+
+Replace part of the heuristic scoring engine with an LLM-assisted reasoning layer.
+
+---
+
+### Competitor evolution
+
+Track how individual genres evolve week after week.
+
+---
+
+### Agentic research assistant
+
+Allow users to ask questions such as:
+
+> "Generate three game concepts targeting women aged 35–50 based on the latest merge-game trends."
+
+The assistant would automatically retrieve relevant market data before generating tailored recommendations.
+
+---
+
+# 📂 Repository Structure
+
+```
+GameScoutAI/
+
+│
+├── app.py
+├── requirements.txt
+├── README.md
+│
+├── src/
+├── scripts/
+├── data/
+├── models/
+│
+└── cloudflare-worker/
+```
+
+---
+
+# 👨‍💻 Author
+
+**Tom Barugel**
+
+Dual Degree
+
+- Georgia Institute of Technology
+- Arts et Métiers ParisTech
+
+---
+
+# 📄 License
+
+This repository was developed as part of a technical case study.
+
+It is intended for demonstration and evaluation purposes.

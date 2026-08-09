@@ -17,14 +17,8 @@ Instead of relying on static dashboards or manual market research, the platform 
 
 # 🚀 Live Demo
 
-**Public demo**
-
-> **ADD YOUR STREAMLIT URL HERE**
-
-Example:
-
 ```
-https://gamescout-ai.streamlit.app
+https://gamescoutai-qjstw95hcerp2qem2tapmz.streamlit.app/
 ```
 
 No installation is required.

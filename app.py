@@ -218,19 +218,34 @@ def render_landing_page() -> None:
 
         st.caption(f"⏱ Estimated duration: {eta}")    
         
-        if st.button("🚀 Start Live Analysis", use_container_width=True):
+        # Two launch options aligned on the same row
+        live_col, cached_col = st.columns([1.7, 1])
+
+        with live_col:
+            start_live = st.button(
+                "🚀 Start Live Analysis",
+                type="primary",
+                width="stretch",
+            )
+
+        with cached_col:
+            use_cached = st.button(
+                "Use Cached Snapshot",
+                width="stretch",
+            )
+
+        if start_live:
             run_live_analysis(max_reviews)
 
-    with fallback:
-        if st.button("Use Cached Snapshot", width="stretch"):
+        if use_cached:
             st.session_state["analysis_complete"] = True
             st.session_state["analysis_mode"] = "Cached snapshot"
             st.session_state["analysis_duration"] = 0.0
             st.rerun()
 
-    st.caption(
-        "Live mode requires internet access. Cached mode uses the exact CSV outputs committed with the project for a reproducible evaluator experience."
-    )
+        st.caption(
+            "Live mode requires internet access. Cached mode uses the exact CSV outputs committed with the project for a reproducible evaluator experience."
+        )
 
 
 def run_live_analysis(max_reviews=None, include_reviews: bool = True) -> None:

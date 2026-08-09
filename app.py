@@ -1,4 +1,16 @@
 from __future__ import annotations
+from io import BytesIO
+
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.enums import TA_CENTER
+from reportlab.platypus import (
+    SimpleDocTemplate,
+    Paragraph,
+    Spacer,
+    ListFlowable,
+    ListItem,
+)
 
 import html
 import time
@@ -343,6 +355,140 @@ except (FileNotFoundError, ValueError) as error:
 # =============================================================================
 # HELPERS
 # =============================================================================
+
+def build_concept_pdf(
+    concept: dict,
+    segment_name: str,
+    opportunity_score: float,
+) -> bytes:
+    """Build a downloadable PDF for one generated game concept."""
+
+    buffer = BytesIO()
+
+    document = SimpleDocTemplate(
+        buffer,
+        pagesize=A4,
+        rightMargin=40,
+        leftMargin=40,
+        topMargin=40,
+        bottomMargin=40,
+    )
+
+    styles = getSampleStyleSheet()
+
+    title_style = styles["Title"]
+    title_style.alignment = TA_CENTER
+
+    story = []
+
+    story.append(
+        Paragraph(
+            str(concept.get("title", "Untitled Game Concept")),
+            title_style,
+        )
+    )
+
+    story.append(
+        Paragraph(
+            str(concept.get("one_line_pitch", "")),
+            styles["Italic"],
+        )
+    )
+
+    story.append(Spacer(1, 18))
+
+    story.append(
+        Paragraph(
+            f"<b>Source market segment:</b> {segment_name}",
+            styles["BodyText"],
+        )
+    )
+
+    story.append(
+        Paragraph(
+            f"<b>Opportunity Score:</b> {opportunity_score:.1f}/100",
+            styles["BodyText"],
+        )
+    )
+
+    story.append(Spacer(1, 14))
+
+    sections = [
+        ("Genre", concept.get("genre")),
+        ("Target audience", concept.get("target_audience")),
+        ("Originality score", f"{concept.get('originality_score', '—')}/100"),
+        ("Core mechanic", concept.get("core_mechanic")),
+        ("Unique twist", concept.get("unique_twist")),
+        ("Market rationale", concept.get("market_rationale")),
+        ("Main risk", concept.get("main_risk")),
+    ]
+
+    for heading, content in sections:
+        if content:
+            story.append(
+                Paragraph(
+                    heading,
+                    styles["Heading2"],
+                )
+            )
+
+            story.append(
+                Paragraph(
+                    str(content),
+                    styles["BodyText"],
+                )
+            )
+
+            story.append(Spacer(1, 10))
+
+    list_sections = [
+        ("Core loop", concept.get("core_loop", [])),
+        (
+            "Pain points addressed",
+            concept.get("pain_points_addressed", []),
+        ),
+        (
+            "Retention ideas",
+            concept.get("retention_ideas", []),
+        ),
+        (
+            "Monetization",
+            concept.get("monetization", []),
+        ),
+    ]
+
+    for heading, items in list_sections:
+        if isinstance(items, list) and items:
+            story.append(
+                Paragraph(
+                    heading,
+                    styles["Heading2"],
+                )
+            )
+
+            story.append(
+                ListFlowable(
+                    [
+                        ListItem(
+                            Paragraph(
+                                str(item),
+                                styles["BodyText"],
+                            )
+                        )
+                        for item in items
+                    ],
+                    bulletType="bullet",
+                )
+            )
+
+            story.append(Spacer(1, 10))
+
+    document.build(story)
+
+    pdf_bytes = buffer.getvalue()
+    buffer.close()
+
+    return pdf_bytes
 
 def render_page_navigation(
     current_page: str,
@@ -916,10 +1062,41 @@ elif page == "Concept Generator":
                 st.session_state["last_concept_segment"] = selected_name
                 st.session_state["last_generation_time"] = time.perf_counter() - generated_at
 
-    if "last_concept" in st.session_state and st.session_state.get("last_concept_segment") == selected_name:
-        render_concept(st.session_state["last_concept"])
+    if ("last_concept" in st.session_state and st.session_state.get("last_concept_segment") == selected_name):
+        concept = st.session_state["last_concept"]
+
+        render_concept(concept)
+
         if st.session_state.get("last_generation_time") is not None:
-            st.caption(f"Generated in {float(st.session_state['last_generation_time']):.1f} seconds via Cloudflare Workers AI.")
+            st.caption(
+                f"Generated in "
+                f"{float(st.session_state['last_generation_time']):.1f} seconds "
+                f"via Cloudflare Workers AI."
+            )
+
+        pdf_bytes = build_concept_pdf(
+            concept=concept,
+            segment_name=selected_name,
+            opportunity_score=float(
+                opportunity["adjusted_opportunity_score"]
+            ),
+        )
+
+        safe_title = (
+            str(concept.get("title", "game_concept"))
+            .lower()
+            .replace(" ", "_")
+            .replace(":", "")
+            .replace("/", "_")
+        )
+
+        st.download_button(
+            label="📄 Download concept as PDF",
+            data=pdf_bytes,
+            file_name=f"{safe_title}.pdf",
+            mime="application/pdf",
+            width="stretch",
+        )
 
     st.caption(
         "The generated concept is creative output, grounded by the displayed evidence but not a prediction of commercial success."

@@ -8,7 +8,7 @@ The pipeline collects current market data, groups games into semantic segments, 
 
 ---
 
-## 🚀 Live Application [Recommended]
+# 🚀 Live Application [Recommended]
 
 The project is already deployed and can be used directly from a browser:
 

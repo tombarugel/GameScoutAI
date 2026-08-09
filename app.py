@@ -570,7 +570,11 @@ def pain_point_label(keywords: object) -> str:
     return " / ".join(term.title() for term in terms[:3])
 
 
-def build_ai_payload(opportunity: pd.Series, style: str) -> dict:
+def build_ai_payload(
+    opportunity: pd.Series,
+    style: str,
+    previous_titles: list[str] | None = None,
+    ) -> dict:
     cluster_id = int(opportunity["cluster_id"])
     pain_points = get_cluster_pain_points(data, cluster_id)
 
@@ -597,6 +601,7 @@ def build_ai_payload(opportunity: pd.Series, style: str) -> dict:
         "signal_summary": str(opportunity.get("signal_summary", "")),
         "pain_points": ai_pain_points,
         "concept_style": style,
+        "previous_titles": previous_titles or [],
     }
 
 
@@ -1046,7 +1051,18 @@ elif page == "Concept Generator":
     generate_clicked = st.button("✨ Generate Game Concept", type="primary", width="stretch")
 
     if generate_clicked:
-        payload = build_ai_payload(opportunity, style)
+        history_key = f"title_history_{selected_name}"
+
+        if history_key not in st.session_state:
+            st.session_state[history_key] = []
+
+        previous_titles = st.session_state[history_key][-5:]
+
+        payload = build_ai_payload(
+            opportunity,
+            style,
+            previous_titles=previous_titles,
+        )
         generated_at = time.perf_counter()
         with st.spinner("Generating a concept from market evidence…"):
             try:
@@ -1060,6 +1076,13 @@ elif page == "Concept Generator":
             else:
                 st.session_state["last_concept"] = concept
                 st.session_state["last_concept_segment"] = selected_name
+                new_title = str(concept.get("title", "")).strip()
+
+                if (
+                    new_title
+                    and new_title not in st.session_state[history_key]
+                ):
+                    st.session_state[history_key].append(new_title)
                 st.session_state["last_generation_time"] = time.perf_counter() - generated_at
                 st.session_state.pop(
                     f"concept_pdf_{selected_name}",

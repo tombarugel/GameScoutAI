@@ -22,6 +22,7 @@ interface GameConceptRequest {
   }>;
 
   concept_style?: "safe" | "differentiated" | "bold";
+  previous_titles?: string[];
 }
 
 
@@ -93,7 +94,11 @@ function buildPrompt(
           2,
         )
       : "No reliable review pain points available.";
-
+  const previousTitles =
+  data.previous_titles &&
+  data.previous_titles.length > 0
+    ? data.previous_titles.join(", ")
+    : "None";
   return `
 You are a senior mobile game product strategist.
 
@@ -126,6 +131,20 @@ CREATIVE DIVERSITY:
 
 CONCEPT STYLE:
 ${styleInstructions[style]}
+
+PREVIOUSLY GENERATED TITLES FOR THIS SEGMENT:
+${previousTitles}
+
+DIVERSITY REQUIREMENTS:
+- This must be a genuinely new ideation attempt.
+- Never reuse a previous title or a close variation of it.
+- Avoid distinctive words already used in previous titles.
+- Do not simply rearrange words from previous titles.
+- Do not build the title directly from the cluster name.
+- Avoid generic constructions such as "[Keyword] Merge", "[Keyword] Quest", "[Keyword] Kingdom" unless strongly justified.
+- Prefer a title derived from the new game's fantasy, setting or identity.
+- The concept itself must also differ meaningfully from previous attempts, not only the title.
+- Explore a different setting, fantasy, progression structure or mechanic combination while remaining grounded in the same market evidence.
 
 MARKET SEGMENT:
 ${data.cluster_name}

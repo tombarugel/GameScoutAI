@@ -151,24 +151,20 @@ def generate_rule_based_cluster_name(
     cluster_id: int,
 ) -> str:
     """
-    Build a readable cluster name using simple deterministic rules.
+    Build a readable and specific cluster name from deterministic semantic rules.
 
-    Specific franchise rules are applied only when the evidence is obvious.
+    The goal is to keep names reproducible while avoiding overly generic labels
+    when several clusters belong to the same broad game family.
     """
+
     keyword_list = [
-        keyword.lower()
-        for keyword in split_pipe_separated_text(
-            keywords
-        )
+        keyword.lower().strip()
+        for keyword in split_pipe_separated_text(keywords)
+        if keyword.strip()
     ]
 
-    games_text = str(
-        representative_games
-    ).lower()
-
-    developer_text = str(
-        top_developer
-    ).lower()
+    games_text = str(representative_games).lower()
+    developer_text = str(top_developer).lower()
 
     combined_text = (
         " ".join(keyword_list)
@@ -178,9 +174,9 @@ def generate_rule_based_cluster_name(
         + developer_text
     )
 
-    # -------------------------------------------------------------------------
-    # Strong franchise / domain patterns
-    # -------------------------------------------------------------------------
+    # =========================================================================
+    # 1. Strong franchise signals
+    # =========================================================================
 
     if (
         "freddy" in combined_text
@@ -196,57 +192,245 @@ def generate_rule_based_cluster_name(
     ):
         return "Papa's Cooking & Time Management"
 
-    if (
-        "casino" in combined_text
-        or "cash" in combined_text
-        or "slots" in combined_text
-    ):
+    # =========================================================================
+    # 2. Semantic theme families
+    # =========================================================================
+
+    theme_keywords = {
+        "Merge": {
+            "merge",
+            "combine",
+            "merging",
+        },
+        "Decoration": {
+            "decorate",
+            "decoration",
+            "renovate",
+            "renovation",
+            "design",
+            "mansion",
+            "home",
+        },
+        "Block Puzzle": {
+            "block",
+            "blocks",
+        },
+        "Sorting": {
+            "sort",
+            "sorting",
+            "color",
+            "colors",
+        },
+        "Word": {
+            "word",
+            "words",
+            "crossword",
+            "clue",
+            "spelling",
+        },
+        "Brain Puzzle": {
+            "brain",
+            "logic",
+            "trivia",
+        },
+        "Match": {
+            "match",
+            "matching",
+            "match3",
+            "match-3",
+        },
+        "RPG": {
+            "rpg",
+            "roleplaying",
+            "role-playing",
+            "hero",
+            "heroes",
+            "quest",
+        },
+        "Combat": {
+            "combat",
+            "battle",
+            "boss",
+            "fight",
+            "fighting",
+        },
+        "Fantasy": {
+            "fantasy",
+            "magic",
+            "dragon",
+            "kingdom",
+        },
+        "Strategy": {
+            "strategy",
+            "strategic",
+            "tactical",
+            "tactics",
+        },
+        "Management": {
+            "management",
+            "manager",
+            "tycoon",
+            "business",
+        },
+        "Simulation": {
+            "simulation",
+            "simulator",
+            "simulate",
+            "life",
+        },
+        "Idle": {
+            "idle",
+            "incremental",
+        },
+        "Casino": {
+            "casino",
+            "slots",
+            "slot",
+            "poker",
+            "blackjack",
+            "cash",
+        },
+        "Sports": {
+            "sport",
+            "sports",
+            "football",
+            "soccer",
+            "basketball",
+            "baseball",
+            "golf",
+        },
+        "Racing": {
+            "race",
+            "racing",
+            "car",
+            "cars",
+            "driving",
+        },
+        "Cooking": {
+            "cook",
+            "cooking",
+            "restaurant",
+            "chef",
+            "food",
+        },
+        "Adventure": {
+            "adventure",
+            "explore",
+            "exploration",
+            "journey",
+        },
+        "Survival": {
+            "survival",
+            "survive",
+            "zombie",
+            "zombies",
+        },
+    }
+
+    theme_scores: dict[str, int] = {}
+
+    for theme, words in theme_keywords.items():
+        score = 0
+
+        for word in words:
+            if word in combined_text:
+                score += 1
+
+        if score > 0:
+            theme_scores[theme] = score
+
+    ranked_themes = sorted(
+        theme_scores.items(),
+        key=lambda item: (
+            item[1],
+            item[0],
+        ),
+        reverse=True,
+    )
+
+    
+
+    # =========================================================================
+    # 3. Strong domain patterns
+    # =========================================================================
+
+    if "Casino" in theme_scores:
         return "Casino & Real-Money Games"
 
     if (
-        "puzzle" in combined_text
-        and (
-            "sort" in combined_text
-            or "block" in combined_text
-            or "brain" in combined_text
-        )
+        "Merge" in theme_scores
+        and "Decoration" in theme_scores
     ):
-        return "Casual Puzzle & Sorting"
+        return "Merge & Decoration Games"
 
     if (
-        "word" in combined_text
-        or "crossword" in combined_text
-        or "clue" in combined_text
+        "Block Puzzle" in theme_scores
+        and "Sorting" in theme_scores
+    ):
+        return "Block & Sorting Puzzle"
+
+    if (
+        "Word" in theme_scores
+        and "Brain Puzzle" in theme_scores
     ):
         return "Word & Brain Games"
 
     if (
-        "rpg" in combined_text
-        or "boss" in combined_text
-        or "battle" in combined_text
+        "RPG" in theme_scores
+        and "Combat" in theme_scores
+        and "Fantasy" in theme_scores
     ):
-        return "RPG & Combat Games"
+        return "Fantasy RPG & Combat"
 
     if (
-        "strategy" in combined_text
-        and (
-            "simulation" in combined_text
-            or "management" in combined_text
-            or "build" in combined_text
-        )
+        "RPG" in theme_scores
+        and "Idle" in theme_scores
     ):
-        return "Strategy & Simulation"
+        return "Idle RPG & Progression"
 
-    # -------------------------------------------------------------------------
-    # Generic fallback based on top useful keywords
-    # -------------------------------------------------------------------------
+    if (
+        "Strategy" in theme_scores
+        and "Management" in theme_scores
+    ):
+        return "Strategy & Management"
+
+    if (
+        "Simulation" in theme_scores
+        and "Management" in theme_scores
+    ):
+        return "Simulation & Management"
+
+    if (
+        "Sports" in theme_scores
+        and "Management" in theme_scores
+    ):
+        return "Sports Management Games"
+
+    # =========================================================================
+    # 4. General two-theme name
+    # =========================================================================
+
+    if len(ranked_themes) >= 2:
+        primary_theme = ranked_themes[0][0]
+        secondary_theme = ranked_themes[1][0]
+
+        return (
+            f"{primary_theme} & "
+            f"{secondary_theme} Games"
+        )
+
+    if len(ranked_themes) == 1:
+        return f"{ranked_themes[0][0]} Games"
+
+    # =========================================================================
+    # 5. Fallback based on useful TF-IDF keywords
+    # =========================================================================
 
     selected_keywords: list[str] = []
 
     for keyword in keyword_list:
-        if not is_useful_cluster_keyword(
-            keyword
-        ):
+
+        if not is_useful_cluster_keyword(keyword):
             continue
 
         already_represented = any(
@@ -262,15 +446,81 @@ def generate_rule_based_cluster_name(
             keyword.title()
         )
 
-        if len(selected_keywords) >= 3:
+        if len(selected_keywords) >= 2:
             break
 
     if not selected_keywords:
         return f"Game Segment {cluster_id}"
 
-    return " / ".join(
-        selected_keywords
+    if len(selected_keywords) == 1:
+        return f"{selected_keywords[0]} Games"
+
+    return (
+        f"{selected_keywords[0]} & "
+        f"{selected_keywords[1]} Games"
     )
+
+def make_cluster_names_unique(
+    dataframe: pd.DataFrame,
+) -> pd.DataFrame:
+    """
+    Ensure cluster names remain unique.
+
+    When two clusters receive the same rule-based name,
+    add the most informative unused keyword to distinguish them.
+    """
+    dataframe = dataframe.copy()
+
+    used_names: set[str] = set()
+
+    for index, row in dataframe.iterrows():
+
+        base_name = str(
+            row["cluster_name"]
+        )
+
+        if base_name not in used_names:
+            used_names.add(base_name)
+            continue
+
+        keywords = split_pipe_separated_text(
+            row["keywords"]
+        )
+
+        unique_name = None
+
+        for keyword in keywords:
+
+            if not is_useful_cluster_keyword(
+                keyword
+            ):
+                continue
+
+            candidate = (
+                f"{keyword.title()} · "
+                f"{base_name}"
+            )
+
+            if candidate not in used_names:
+                unique_name = candidate
+                break
+
+        if unique_name is None:
+            unique_name = (
+                f"{base_name} "
+                f"(Segment {int(row['cluster_id'])})"
+            )
+
+        dataframe.at[
+            index,
+            "cluster_name",
+        ] = unique_name
+
+        used_names.add(
+            unique_name
+        )
+
+    return dataframe
 
 
 # =============================================================================
@@ -741,6 +991,10 @@ def build_opportunity_scores(
             ),
         ),
         axis=1,
+    )
+
+    dataframe = make_cluster_names_unique(
+    dataframe
     )
 
     # -------------------------------------------------------------------------

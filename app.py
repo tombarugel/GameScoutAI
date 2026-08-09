@@ -192,11 +192,8 @@ def render_landing_page() -> None:
         "The cached snapshot remains available only as a fallback if an external App Store endpoint is unavailable."
     )
 
-    include_reviews = st.checkbox(
-        "Include live review collection and pain-point analysis",
-        value=True,
-        help="Recommended for the complete demo. Apple's public review feed has uneven coverage and can add several minutes.",
-    )
+    include_reviews = True
+    
 
     primary, fallback = st.columns([1.25, 0.75])
     with primary:

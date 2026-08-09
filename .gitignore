@@ -28,7 +28,7 @@ node_modules/
 
 # Generated raw snapshots
 data/raw/*.csv
-!data/raw/app_store_charts_20260807_122441.csv
+!data/raw/app_store_charts_20260809_211059.csv
 
 # Experimental outputs
 data/processed/*_embeddings.csv

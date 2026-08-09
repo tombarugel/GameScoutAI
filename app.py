@@ -509,7 +509,9 @@ if page == "Analysis Summary":
     summary = pipeline_snapshot_summary()
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("Games analyzed", summary["Games"])
-    c2.metric("Market segments", summary["Segments"])
+    c2.metric(
+    "Market segments",
+    data["opportunities"]["cluster_id"].nunique(),)
     c3.metric("Reviews collected", summary["Reviews"])
     c4.metric("Pain-point groups", summary["Pain points"])
 

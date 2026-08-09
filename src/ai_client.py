@@ -13,24 +13,11 @@ REQUEST_TIMEOUT_SECONDS = 90
 
 
 def get_worker_url() -> str:
-    """Resolve the AI backend URL.
-
-    Priority:
-    1. explicit GAMESCOUT_WORKER_URL override;
-    2. a running local Wrangler server (developer convenience);
-    3. the deployed production Worker URL.
-    """
+    """Resolve the AI backend URL."""
     configured = os.getenv("GAMESCOUT_WORKER_URL")
+
     if configured:
         return configured.rstrip("/")
-
-    local_url = "http://localhost:8787"
-    try:
-        response = requests.get(f"{local_url}/health", timeout=2)
-        if response.ok:
-            return local_url
-    except requests.RequestException:
-        pass
 
     return DEFAULT_WORKER_URL.rstrip("/")
 

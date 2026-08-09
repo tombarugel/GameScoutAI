@@ -113,7 +113,7 @@ Suggested screenshots:
 Open the public Streamlit application:
 
 ```
-https://gamescout-ai.streamlit.app
+https://gamescoutai-qjstw95hcerp2qem2tapmz.streamlit.app/
 ```
 
 ---

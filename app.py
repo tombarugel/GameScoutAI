@@ -201,15 +201,15 @@ def render_landing_page() -> None:
 
         review_limit = st.radio(
             "Maximum reviews per game",
-            ["⚡ Fast (20)", "⚖️ Balanced (50)", "🔬 Full (Unlimited)"],
+            ["⚡ 20 (Fast)", "⚖️ 50 (Balanced)", "🔬 Unlimited (Slow)"],
             horizontal=True,
             help="Higher limits improve pain-point analysis but increase execution time."
         )
 
-        if review_limit == "⚡ Fast (20)":
+        if review_limit == "⚡ 20 (Fast)":
             max_reviews = 20
             eta = "~2 min"
-        elif review_limit == "⚖️ Balanced (50)":
+        elif review_limit == "⚖️ 50 (Balanced)":
             max_reviews = 50
             eta = "~5 min"
         else:

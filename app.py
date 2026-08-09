@@ -1061,6 +1061,10 @@ elif page == "Concept Generator":
                 st.session_state["last_concept"] = concept
                 st.session_state["last_concept_segment"] = selected_name
                 st.session_state["last_generation_time"] = time.perf_counter() - generated_at
+                st.session_state.pop(
+                    f"concept_pdf_{selected_name}",
+                    None,
+                )
 
     if ("last_concept" in st.session_state and st.session_state.get("last_concept_segment") == selected_name):
         concept = st.session_state["last_concept"]
@@ -1074,13 +1078,18 @@ elif page == "Concept Generator":
                 f"via Cloudflare Workers AI."
             )
 
-        pdf_bytes = build_concept_pdf(
-            concept=concept,
-            segment_name=selected_name,
-            opportunity_score=float(
-                opportunity["adjusted_opportunity_score"]
-            ),
-        )
+        pdf_key = f"concept_pdf_{selected_name}"
+
+        if pdf_key not in st.session_state:
+            st.session_state[pdf_key] = build_concept_pdf(
+                concept=concept,
+                segment_name=selected_name,
+                opportunity_score=float(
+                    opportunity["adjusted_opportunity_score"]
+                ),
+            )
+
+        pdf_bytes = st.session_state[pdf_key]
 
         safe_title = (
             str(concept.get("title", "game_concept"))

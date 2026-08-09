@@ -8,11 +8,11 @@ The pipeline collects current market data, groups games into semantic segments, 
 
 ---
 
-## 🚀 Live Application
+## 🚀 Live Application [Recommended]
 
 The project is already deployed and can be used directly from a browser:
 
-**https://gamescout-ai.streamlit.app**
+**https://gamescoutai-qjstw95hcerp2qem2tapmz.streamlit.app/**
 
 No installation, terminal, API key, or Cloudflare configuration is required.
 
@@ -43,7 +43,7 @@ The snapshot represents the results of a previous pipeline run. Therefore, chang
 
 ---
 
-# 👨‍💻 Run Locally
+# 👨‍💻 Run Locally [Not Recommended]
 
 To run the application from the source code:
 

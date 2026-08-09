@@ -329,12 +329,31 @@ def generate_rule_based_cluster_name(
 
     theme_scores: dict[str, int] = {}
 
+    tokens = set(
+    combined_text
+    .lower()
+    .replace("/", " ")
+    .replace("·", " ")
+    .replace(",", " ")
+    .replace(".", " ")
+    .split()
+)
+
     for theme, words in theme_keywords.items():
         score = 0
 
         for word in words:
-            if word in combined_text:
-                score += 1
+            word = word.lower().strip()
+
+            if " " not in word:
+                # Mot simple : correspondance exacte uniquement
+                if word in tokens:
+                    score += 1
+
+            else:
+                # Expression composée : recherche de l'expression complète
+                if word in combined_text.lower():
+                    score += 1
 
         if score > 0:
             theme_scores[theme] = score
